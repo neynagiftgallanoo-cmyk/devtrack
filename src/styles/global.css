@@ -1,0 +1,1494 @@
+/* ------------------------------------------------------------------
+   DevTrack styles
+   1. Theme tokens   2. Base        3. Layout + sidebar   4. Shared pieces
+   5. Planner        6. To-do list  7. Calendar           8. Weekly view
+   9. Projects       10. Dialog     11. Phone layout
+   ------------------------------------------------------------------ */
+
+/* 1. Theme tokens -------------------------------------------------
+   Palette: Lavender #BBB7E5 · Light Rose #F7DFDF · Pistachio #BDC594
+            Snow #DAE9FA · Baby Pink #EFBDBD · Pale Yellow #F1ECC6
+   The pastels are fills. Text, outlines and solid buttons use --ink,
+   a dark plum-grey that is readable on every pastel.                */
+:root {
+  --lavender: #bbb7e5;
+  --light-rose: #f7dfdf;
+  --pistachio: #bdc594;
+  --snow: #dae9fa;
+  --baby-pink: #efbdbd;
+  --pale-yellow: #f1ecc6;
+
+  --bg: #fbf8f7;
+  --surface: #ffffff;
+  --ink: #3d3547;            /* text, outlines, solid buttons */
+  --on-ink: #fbf8f7;         /* text on --ink */
+  --on-pastel: #3d3547;      /* text on any pastel fill, in both themes */
+  --muted: #5f586e;
+  --accent: #6258a6;         /* italic accent words */
+  --line: var(--lavender);   /* calendar grid lines */
+  --divider: var(--light-rose);
+
+  --sidebar-bg: var(--lavender);
+  --sidebar-text: #3d3547;
+  --strip-bg: var(--baby-pink);
+  --week-bg: var(--snow);
+  --tag-bg: var(--pale-yellow);
+  --out-month-bg: var(--light-rose);
+  --field-bg: var(--bg);
+
+  --radius: 28px;
+  --radius-sm: 20px;
+  --sidebar-width: 256px;
+  --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #1d1a26;
+  --surface: #282433;
+  --ink: #f1ecf7;
+  --on-ink: #1d1a26;
+  --muted: #b9b2cb;
+  --accent: #c9c5ef;
+  --line: #4b4466;
+  --divider: #3a3449;
+
+  --sidebar-bg: #2f2a40;
+  --sidebar-text: #f1ecf7;
+  --week-bg: #262c3d;
+  --out-month-bg: #221e2c;
+  --field-bg: #1d1a26;
+  color-scheme: dark;
+}
+
+/* 2. Base --------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+em {
+  font-style: italic;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+input:not([type='checkbox']),
+select,
+textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 16px;
+  background: var(--field-bg);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+}
+
+textarea {
+  border-radius: var(--radius-sm);
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+/* Serif display type with italic accent words */
+.display {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(42px, 5.2vw, 68px);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.display em,
+.section-title em {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 12px;
+}
+
+.link {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+}
+
+/* 3. Layout + sidebar --------------------------------------------- */
+.app {
+  display: flex;
+  height: 100%;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.sidebar {
+  flex: none;
+  width: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 32px 18px 24px;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  overflow-y: auto;
+}
+
+.sidebar :focus-visible {
+  outline-color: var(--sidebar-text);
+}
+
+.sidebar__brand {
+  padding: 0 12px;
+  font-family: var(--serif);
+  font-size: 38px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.nav-item:hover {
+  border-color: currentColor;
+}
+
+.nav-item.is-active {
+  background: var(--bg);
+  border-color: var(--ink);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.sidebar__section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar__heading {
+  padding: 0 16px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sidebar__empty {
+  padding: 0 16px;
+  font-size: 13px;
+}
+
+/* A project row: the full name wraps instead of being cut off */
+.project-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+.project-link:hover {
+  border-color: currentColor;
+}
+
+.project-link.is-active {
+  background: var(--bg);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.project-link .dot {
+  margin-top: 6px;
+  border-color: currentColor;
+}
+
+.project-link__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-link__name {
+  display: block;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.project-link__sub {
+  display: block;
+  font-size: 12px;
+}
+
+.count-badge {
+  flex: none;
+  min-width: 24px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sidebar__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar__new {
+  border-color: currentColor;
+}
+
+.sidebar__theme {
+  justify-content: center;
+}
+
+/* 4. Shared pieces ------------------------------------------------ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.1s;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.btn--outline,
+.btn--ghost {
+  background: transparent;
+}
+
+.btn--outline:hover,
+.btn--ghost:hover {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.btn--ghost {
+  border-color: transparent;
+}
+
+.btn--small {
+  min-height: 32px;
+  padding: 0 14px;
+  font-size: 12px;
+}
+
+.btn--danger {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.icon-btn {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.icon-btn:hover {
+  background: color-mix(in srgb, var(--ink) 8%, var(--surface));
+}
+
+/* Round checkbox. --check-tick is the colour of the tick mark. */
+.checkbox {
+  --check-tick: var(--surface);
+  flex: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+}
+
+.checkbox:checked {
+  background: currentColor;
+}
+
+.checkbox:checked::after {
+  content: '';
+  width: 10px;
+  height: 5px;
+  border: solid var(--check-tick);
+  border-width: 0 0 2px 2px;
+  transform: translateY(-1px) rotate(-45deg);
+}
+
+.checkbox--small {
+  width: 18px;
+  height: 18px;
+}
+
+.checkbox--small:checked::after {
+  width: 8px;
+  height: 4px;
+}
+
+.count-pill {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 10px;
+  border-radius: 999px;
+  background: var(--badge-bg, var(--pale-yellow));
+  color: var(--on-pastel);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge--status-planning { --badge-bg: var(--pale-yellow); }
+.badge--status-in_progress { --badge-bg: var(--snow); }
+.badge--status-testing { --badge-bg: var(--lavender); }
+.badge--status-completed { --badge-bg: var(--pistachio); }
+.badge--priority-low { --badge-bg: var(--snow); }
+.badge--priority-medium { --badge-bg: var(--pale-yellow); }
+.badge--priority-high { --badge-bg: var(--baby-pink); }
+
+.empty {
+  padding: 40px 16px;
+  text-align: center;
+  border: 1px dashed var(--ink);
+  border-radius: var(--radius);
+}
+
+/* 5. Planner ------------------------------------------------------ */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 36px 36px 28px;
+}
+
+.hero__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.date-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--tag-bg);
+  color: var(--on-pastel);
+  font-size: 12px;
+  font-weight: 600;
+  transform: rotate(-3deg);
+}
+
+.filter-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* Monthly | Weekly */
+.switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.switch button {
+  min-height: 38px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.switch button.is-active {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* Summary strip */
+.ticker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 20px;
+  padding: 8px 36px;
+  background: var(--strip-bg);
+  color: var(--on-pastel);
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.ticker__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.planner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px 36px 44px;
+}
+
+/* 6. To-do list --------------------------------------------------- */
+.todo {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 26px 28px 28px;
+}
+
+.todo__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.todo__body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.quick-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quick-add__title {
+  flex: 3 1 260px;
+}
+
+.quick-add__row {
+  flex: 4 1 420px;
+  display: grid;
+  grid-template-columns: 1.1fr 1.3fr 1fr auto;
+  gap: 8px;
+}
+
+/* Overdue | Today | Upcoming | Completed side by side */
+.task-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px 28px;
+  align-items: start;
+}
+
+.group-heading {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.task__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.task__title {
+  display: block;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.task.is-done .task__body {
+  opacity: 0.6;
+}
+
+.task.is-done .task__title {
+  text-decoration: line-through;
+}
+
+.task__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.task__project {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.task__project .dot {
+  width: 8px;
+  height: 8px;
+}
+
+.task__due-wrap {
+  position: relative;
+  flex: none;
+}
+
+.task__due {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.task__due:hover {
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.task__due.is-overdue {
+  background: var(--baby-pink);
+  color: var(--on-pastel);
+}
+
+/* Invisible native date input: it only anchors the browser's date picker. */
+.task__date-input {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.task__delete {
+  flex: none;
+  width: 22px;
+  line-height: 22px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.task:hover .task__delete,
+.task__delete:focus-visible {
+  opacity: 1;
+}
+
+.task__delete:hover {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* 7. Calendar ----------------------------------------------------- */
+.calendar {
+  padding: 28px;
+}
+
+.calendar__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.calendar__head .section-title {
+  font-size: 44px;
+}
+
+.calendar__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+}
+
+.calendar__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend__ring {
+  width: 12px;
+  height: 12px;
+  border: 1.5px dashed var(--ink);
+  border-radius: 50%;
+}
+
+.legend--below {
+  margin-top: 12px;
+}
+
+.cal-scroll {
+  overflow-x: auto;
+}
+
+.cal-grid {
+  min-width: 720px;
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cal-weekdays,
+.cal-cells {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.cal-weekdays {
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cal-weekdays > div {
+  padding: 10px 12px;
+}
+
+.cal-cells {
+  gap: 1px;
+  background: var(--line);
+}
+
+.cal-cell {
+  min-height: 132px;
+  padding: 10px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cal-cell.is-out {
+  background: var(--out-month-bg);
+}
+
+.cal-cell.is-out .cal-num {
+  color: var(--muted);
+}
+
+/* Highlight the day a dragged task would land on */
+.cal-cell.is-over {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.cal-num {
+  align-self: flex-start;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.cal-num.is-today {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* A task on the calendar, filled with its project's colour */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px 4px 5px;
+  border-radius: 999px;
+  background: var(--chip-color);
+  color: var(--on-pastel);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: grab;
+}
+
+.chip .checkbox {
+  --check-tick: var(--chip-color);
+}
+
+.chip.is-done {
+  opacity: 0.6;
+}
+
+.chip.is-done .chip__title {
+  text-decoration: line-through;
+}
+
+.chip__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chip--deadline {
+  padding: 4px 10px;
+  border: 1.5px dashed currentColor;
+  background: transparent;
+  color: inherit;
+  font-weight: 700;
+}
+
+/* 8. Weekly view -------------------------------------------------- */
+.week {
+  padding: 28px 28px 30px;
+  background: var(--week-bg);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+}
+
+.week__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.week__head .section-title {
+  font-size: 44px;
+}
+
+.week__head .section-title em {
+  color: inherit;
+}
+
+.week__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.week__range {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.week__days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.day-card {
+  min-height: 210px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bg);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+}
+
+.day-card.is-today {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.day-card.is-today .checkbox {
+  --check-tick: var(--ink);
+}
+
+.day-card.is-over {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.day-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.day-card__name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.day-card__num {
+  font-family: var(--serif);
+  font-size: 40px;
+  line-height: 1;
+}
+
+.day-card__tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.day-card__empty {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+}
+
+.day-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: grab;
+}
+
+.day-task .checkbox {
+  --check-tick: var(--bg);
+}
+
+.day-task__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.day-task__title {
+  display: block;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.day-task__project {
+  display: block;
+  font-size: 12px;
+}
+
+.day-task.is-done .day-task__text {
+  opacity: 0.6;
+}
+
+.day-task.is-done .day-task__title {
+  text-decoration: line-through;
+}
+
+/* 9. Projects ----------------------------------------------------- */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+}
+
+.project-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.project-card__title {
+  font-family: var(--serif);
+  font-size: 28px;
+  line-height: 1.05;
+  text-align: left;
+}
+
+/* Project colour marker */
+.project-card__title::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--project-color);
+}
+
+.project-card__title:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.project-card__desc {
+  color: var(--muted);
+}
+
+.project-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px 8px;
+  flex-wrap: wrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: 2px 10px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.project-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.progress {
+  flex: 1;
+  height: 8px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background: var(--project-color);
+  transition: width 0.2s;
+}
+
+.repo-link {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* 10. Dialog ------------------------------------------------------ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.field > span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.field-row {
+  display: flex;
+  gap: 10px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(40 34 50 / 0.5);
+}
+
+.modal__panel {
+  position: relative;
+  width: min(540px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+}
+
+.modal__panel h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 1;
+}
+
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+}
+
+.swatch.is-selected {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink);
+}
+
+/* 11. Phone layout (keep 820px in sync with hooks/useIsMobile.ts) -- */
+@media (max-width: 820px) {
+  .app {
+    flex-direction: column-reverse;
+  }
+
+  /* Sidebar becomes a bottom bar: Planner, Projects, theme */
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--ink);
+    overflow: visible;
+  }
+
+  .sidebar__brand,
+  .sidebar__section,
+  .sidebar__new {
+    display: none;
+  }
+
+  .sidebar__nav {
+    flex: 1;
+    flex-direction: row;
+  }
+
+  .sidebar .nav-item {
+    justify-content: center;
+    min-height: 48px;
+  }
+
+  .sidebar__theme {
+    width: 48px;
+    padding: 0;
+  }
+
+  .sidebar__theme span {
+    display: none;
+  }
+
+  .hero {
+    gap: 16px;
+    padding: 22px 16px 16px;
+  }
+
+  .hero__actions {
+    width: 100%;
+  }
+
+  .switch {
+    flex: 1;
+  }
+
+  .switch button {
+    flex: 1;
+    min-height: 44px;
+  }
+
+  .ticker {
+    justify-content: center;
+    gap: 2px 10px;
+    padding: 6px 12px;
+  }
+
+  /* The deadline note is dropped on phones to keep the strip short. */
+  .ticker__extra {
+    display: none;
+  }
+
+  .planner {
+    gap: 16px;
+    padding: 16px 16px 28px;
+  }
+
+  .section-title,
+  .calendar__head .section-title,
+  .week__head .section-title {
+    font-size: 30px;
+  }
+
+  /* To-do list: a button that opens the list */
+  .todo {
+    gap: 0;
+    padding: 6px 16px;
+    border-radius: 24px;
+  }
+
+  .todo__heading {
+    margin: 0;
+  }
+
+  .todo__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-height: 56px;
+    text-align: left;
+  }
+
+  .todo__summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chevron {
+    transition: transform 0.2s;
+  }
+
+  .chevron.is-open {
+    transform: rotate(180deg);
+  }
+
+  .todo__body {
+    gap: 18px;
+    padding: 8px 0 14px;
+  }
+
+  .quick-add__row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .task-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .task__delete {
+    opacity: 1;
+  }
+
+  /* Compact calendar: dots instead of task names */
+  .calendar {
+    padding: 16px 14px;
+    border-radius: 24px;
+  }
+
+  .calendar__head {
+    margin-bottom: 12px;
+  }
+
+  .cal-grid {
+    min-width: 0;
+    border-radius: 16px;
+  }
+
+  .cal-weekdays {
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  .cal-weekdays > div {
+    padding: 6px 0;
+  }
+
+  .cal-cell {
+    min-height: 52px;
+    padding: 5px 0 0;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cal-num {
+    align-self: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1.5px solid transparent;
+    font-size: 18px;
+    line-height: 25px;
+  }
+
+  .cal-num.is-deadline {
+    border: 1.5px dashed var(--ink);
+  }
+
+  .cal-dots {
+    display: flex;
+    gap: 3px;
+    height: 8px;
+  }
+
+  .cal-dot {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+  }
+
+  .cal-dot.is-done {
+    opacity: 0.35;
+  }
+
+  /* Weekly: one row per day */
+  .week {
+    padding: 18px 14px;
+    border-radius: 24px;
+  }
+
+  .week__head {
+    margin-bottom: 14px;
+  }
+
+  .week__days {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .day-card {
+    min-height: 64px;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 18px;
+  }
+
+  .day-card__head {
+    flex: none;
+    width: 40px;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .day-card__num {
+    font-size: 28px;
+  }
+
+  .day-card__tasks {
+    flex: 1;
+  }
+
+  .field-row {
+    flex-direction: column;
+  }
+
+  .modal__panel {
+    padding: 22px 18px;
+  }
+
+  /* 16px inputs stop iOS Safari from zooming in on focus. */
+  input:not([type='checkbox']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
